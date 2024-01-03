@@ -1,0 +1,95 @@
+﻿@using A4WebApi.Shared.Models;
+@page "/submitdata"
+@using System.Net.Http
+@using System.Net.Http.Json
+@using System.Text.Json;
+@inject HttpClient Http
+
+<h3>DoctorPage</h3>
+
+<EditForm Model="@doc" OnValidSubmit="@HandleValidSubmit" action="api/v1/doctor/postdoctor">
+
+    <div class="form-group">
+        <label for="DId">ID:</label>
+        <InputNumber id="DId" @bind-Value="doc.DoctorId" class="form-control" />
+    </div>
+    
+    <div class="form-group">
+        <label for="Name">Name:</label>
+        <InputText id="Name" @bind-Value="doc.Name" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="Specialization">Specialization:</label>
+        <InputText id="Specialization" @bind-Value="doc.Specialization" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="AppointmentPrice">Appointment Price:</label>
+        <InputNumber id="AppointmentPrice" @bind-Value="doc.AppointmentPrice" class="form-control" />
+    </div>
+
+    <button  formaction="post" type="submit" class="btn btn-primary">Save</button>
+</EditForm>
+
+@* <table>
+
+    <thead>Id</thead>
+    <thead>Name</thead>
+    <thead>Specialization</thead>
+    <thead>Appointment Price</thead>
+
+
+    @foreach (Doctor d in doctors)
+    {
+        <tr>
+            <td>@d.DoctorId</td>
+            <td>@d.Name</td>
+            <td>@d.Specialization</td>
+            <td>@d.AppointmentPrice</td>
+
+        </tr>
+
+
+
+    }
+</table> *@
+
+@code {
+    Doctor doc = new Doctor();
+
+    // Doctor json = JsonSerializer.Serialize(doc);
+
+    List<Doctor> doctors = new List<Doctor>();
+
+    // [Inject]
+    // private DataService dataService { get; set; }
+
+    // protected override async Task OnInitializedAsync()
+    // {
+
+    //      doctors = await Http.GetFromJsonAsync<List<Doctor>>("/pass");
+    //             var students = _dbcontext.Students. (x=>x.RollNumber).Skip(1).Take(1);
+
+    // }
+    protected override async Task OnInitializedAsync()
+    {
+        doctors = await Http.GetFromJsonAsync<List<Doctor>>("api/v2doctor/pass");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        doctors = await Http.GetFromJsonAsync<List<Doctor>>("api/v2/doctor/pass");
+
+    }
+
+
+        
+    private async Task HandleValidSubmit()
+    {
+        // var addItem = new { DoctorId = doc.DoctorId, Name = doc.Name, Specialization = doc.Specialization, AppointmentPrice = doc.AppointmentPrice };
+        await Http.PostAsJsonAsync<Doctor>("api/v2/doctor/savedoctor", doc);
+        // await dataService.SubmitData(doc);
+    }
+
+}
